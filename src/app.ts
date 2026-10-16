@@ -1,6 +1,10 @@
+
 import express from "express";
 
 import { env } from "./config/env.js";
+import { errorHandler } from "./middleware/error-handler.js";
+import { notFoundHandler } from "./middleware/not-found.js";
+
 
 const app = express();
 
@@ -15,5 +19,13 @@ app.get("/health", (_req, res) => {
     environment: env.NODE_ENV,
   });
 });
+
+
+
+// Convert unmatched routes into application errors.
+app.use(notFoundHandler);
+
+// Handle all errors forwarded through Express.
+app.use(errorHandler);
 
 export default app;
