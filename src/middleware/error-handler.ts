@@ -3,6 +3,7 @@ import type { ErrorRequestHandler } from "express";
 
 import { env } from "../config/env.js";
 import { AppError } from "../utils/app-error.js";
+import { ZodError } from "zod";
 
 function isMalformedJsonError(error: unknown): boolean {
   return (
@@ -14,6 +15,9 @@ function isMalformedJsonError(error: unknown): boolean {
     error.status === 400
   );
 }
+
+
+
 
 export const errorHandler: ErrorRequestHandler = (
   error,
@@ -31,6 +35,23 @@ export const errorHandler: ErrorRequestHandler = (
 
     return;
   }
+
+
+  // Handle Zod validation errors.
+  if (error instanceof ZodError) {
+    res.status(400).json({
+      success: false,
+      status: "fail",
+      message: "Request validation failed",
+      errors: error.issues.map((issue) => ({
+        field: issue.path.join("."),
+        message: issue.message,
+      })),
+    });
+
+    return;
+  }
+
 
   // Handle expected application errors.
   if (error instanceof AppError) {
