@@ -7,13 +7,20 @@ export const createUserSchema = z.object({
     .trim()
     .min(1, "Name is required"),
 
-  email: z
-    .string()
-    .trim()
-    .email("Please provide a valid email address"),
+  
+email: z
+  .string()
+  .trim()
+  .email("Please provide a valid email address")
+  .toLowerCase(),
+
 
   age: z
     .number()
     .int("Age must be an integer")
     .min(18, "You must be at least 18 years old"),
 });
+
+
+export type CreateUserInput = z.infer<typeof createUserSchema>;
+
