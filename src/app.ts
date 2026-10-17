@@ -4,20 +4,16 @@ import express from "express";
 import { env } from "./config/env.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { notFoundHandler } from "./middleware/not-found.js";
+import healthRouter from "./routes/health.routes.js";
 
 const app = express();
 
 // Parse incoming JSON request bodies.
 app.use(express.json());
 
-// Health-check endpoint.
-app.get("/health", (_req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Professional Express Backend is running",
-    environment: env.NODE_ENV,
-  });
-});
+
+// Register health-related routes under /health.
+app.use("/health", healthRouter);
 
 // Convert unmatched routes into application errors.
 app.use(notFoundHandler);
