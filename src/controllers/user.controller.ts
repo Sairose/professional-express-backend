@@ -1,25 +1,23 @@
 
 import type { RequestHandler } from "express";
-import { ZodError } from "zod";
 
-import { prepareUserData } from "../services/user.service.js";
+import { createUserService } from "../services/user.service.js";
 
-// Validate and prepare user data received from the client.
-export const createUser: RequestHandler = (req, res, next) => {
+// Create a user and return the saved document's public data.
+export const createUser: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
   try {
-    const userData = prepareUserData(req.body);
+    const user = await createUserService(req.body);
 
     res.status(201).json({
       success: true,
-      message: "User data validated successfully",
-      data: userData,
+      message: "User created successfully",
+      data: user,
     });
   } catch (error: unknown) {
-    if (error instanceof ZodError) {
-      next(error);
-      return;
-    }
-
     next(error);
   }
 };
