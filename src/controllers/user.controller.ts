@@ -12,6 +12,8 @@ import type { PaginationInput } from "../schemas/pagination.schema.js";
 import { getUserByIdService } from "../services/get-user.service.js";
 import { AppError } from "../utils/app-error.js";
 
+import { updateUserService } from "../services/update-user.service.js";
+
 
 // Create a user and return the saved document's public data.
 export const createUser: RequestHandler = async (
@@ -87,3 +89,28 @@ export const getUserById: RequestHandler = async (
   }
 };
 
+
+export const updateUser: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const id = req.params.id;
+
+    if (typeof id !== "string") {
+      next(new AppError("Invalid user ID", 400));
+      return;
+    }
+
+    const user = await updateUserService(id, req.body);
+
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      data: user,
+    });
+  } catch (error: unknown) {
+    next(error);
+  }
+};

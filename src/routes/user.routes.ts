@@ -5,13 +5,23 @@ import {
   createUser,
   getUserById,
   getUsers,
+  updateUser,
 } from "../controllers/user.controller.js";
 import { paginationSchema } from "../schemas/pagination.schema.js";
 import { userIdSchema } from "../schemas/user-id.schema.js";
 import { validateParams } from "../middleware/validate-params.js";
 import { validateQuery } from "../middleware/validate-query.js";
+import { updateUserSchema } from "../schemas/update-user.schema.js";
+import { validateRequest } from "../middleware/validate-request.js";
 
 const userRouter = Router();
+
+userRouter.patch(
+  "/:id",
+  validateParams(userIdSchema),
+  validateRequest(updateUserSchema),
+  updateUser,
+);
 
 // Retrieve one user by ID after validating the URL parameter.
 userRouter.get(
@@ -25,5 +35,7 @@ userRouter.get("/", validateQuery(paginationSchema), getUsers);
 
 // Create a new user.
 userRouter.post("/", createUser);
+
+
 
 export default userRouter;
