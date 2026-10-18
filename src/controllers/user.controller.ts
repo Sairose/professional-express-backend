@@ -9,6 +9,10 @@ import { getPaginatedUsersService } from "../services/user-list.service.js";
 import type { PaginationInput } from "../schemas/pagination.schema.js";
 
 
+import { getUserByIdService } from "../services/get-user.service.js";
+import { AppError } from "../utils/app-error.js";
+
+
 // Create a user and return the saved document's public data.
 export const createUser: RequestHandler = async (
   req,
@@ -50,6 +54,33 @@ export const getUsers: RequestHandler<
       message: "Users retrieved successfully",
       data: users.users,
       pagination: users.pagination,
+    });
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+
+
+export const getUserById: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const id = req.params.id;
+
+    if (typeof id !== "string") {
+      next(new AppError("Invalid user ID", 400));
+      return;
+    }
+
+    const user = await getUserByIdService(id);
+
+    res.status(200).json({
+      success: true,
+      message: "User retrieved successfully",
+      data: user,
     });
   } catch (error: unknown) {
     next(error);
