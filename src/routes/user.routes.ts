@@ -3,6 +3,7 @@ import { Router } from "express";
 
 import {
   createUser,
+  deleteUser,
   getUserById,
   getUsers,
   updateUser,
@@ -15,6 +16,12 @@ import { updateUserSchema } from "../schemas/update-user.schema.js";
 import { validateRequest } from "../middleware/validate-request.js";
 
 const userRouter = Router();
+
+userRouter.delete(
+  "/:id",
+  validateParams(userIdSchema),
+  deleteUser,
+);
 
 userRouter.patch(
   "/:id",
