@@ -13,6 +13,7 @@ import { getUserByIdService } from "../services/get-user.service.js";
 import { AppError } from "../utils/app-error.js";
 
 import { updateUserService } from "../services/update-user.service.js";
+import { deleteUserService } from "../services/delete-user.service.js";
 
 
 // Create a user and return the saved document's public data.
@@ -114,3 +115,26 @@ export const updateUser: RequestHandler = async (
     next(error);
   }
 };
+
+
+export const deleteUser: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const id = req.params.id;
+
+    if (typeof id !== "string") {
+      next(new AppError("Invalid user ID", 400));
+      return;
+    }
+
+    await deleteUserService(id);
+
+    res.status(204).send();
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+    
