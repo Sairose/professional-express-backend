@@ -278,6 +278,53 @@ describe("User API integration tests", () => {
     });
   });
 
+    it("should reject an empty update and preserve the user data", async () => {
+        const user = await UserModel.create({
+            name: "Original Name",
+            email: "original@example.com",
+            age: 25,
+        });
+
+        const response = await request(app)
+            .patch(`/api/users/${user._id.toString()}`)
+            .send({});
+
+        expect(response.status).toBe(400);
+
+        const unchangedUser = await UserModel.findById(user._id).exec();
+
+        expect(unchangedUser).not.toBeNull();
+        expect(unchangedUser?.name).toBe("Original Name");
+        expect(unchangedUser?.email).toBe("original@example.com");
+        expect(unchangedUser?.age).toBe(25);
+    });
+
+    it("should preserve unchanged fields when updating only the name", async () => {
+        const user = await UserModel.create({
+            name: "Original Name",
+            email: "original@example.com",
+            age: 25,
+        });
+
+        const response = await request(app)
+            .patch(`/api/users/${user._id.toString()}`)
+            .send({ name: "Updated Name" });
+
+        expect(response.status).toBe(200);
+
+        expect(response.body.data).toMatchObject({
+            id: user._id.toString(),
+            name: "Updated Name",
+            email: "original@example.com",
+            age: 25,
+        });
+
+        const updatedUser = await UserModel.findById(user._id).exec();
+
+        expect(updatedUser?.email).toBe("original@example.com");
+        expect(updatedUser?.age).toBe(25);
+    });
+
   it("should return 404 when updating a nonexistent user", async () => {
     const response = await request(app)
       .patch("/api/users/507f1f77bcf86cd799439011")
@@ -374,5 +421,42 @@ describe("User API integration tests", () => {
       "User ID must be a valid MongoDB ObjectId",
     );
   });
+
+
+    //pagination tests
+    it("should return an empty list for a page beyond the available results", async() =>{
+        await UserModel.create([
+            { name: "User One", email: "one@example.com", age: 21 },
+            { name: "User Two", email: "two@example.com", age: 22 },
+            { name: "User Three", email: "three@example.com", age: 23 },
+        ]);
+
+        const response = await request(app).get("/api/users?page=5&limit=2");
+
+        expect(response.status).toBe(200);
+        expect(response.body.data).toEqual([]);
+        expect(response.body.pagination).toMatchObject({
+            page: 5,
+            limit: 2,
+            totalUsers: 3,
+            totalPages: 2,
+            hasNextPage: false,
+            hasPreviousPage: true,
+        })
+    })
+
+    it("should accept the maximum pagination limit", async () =>{
+         const response = await request(app).get("/api/users?limit=100");
+
+         expect(response.status).toBe(200);
+         expect(response.body.data).toEqual([]);
+          expect(response.body.pagination).toMatchObject({
+            page: 1,
+            limit: 100,
+            totalUsers: 0,
+            totalPages: 0,
+        });
+
+    })
 
 });
