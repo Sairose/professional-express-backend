@@ -96,6 +96,10 @@ userRouter.delete(
  *     responses:
  *       "200":
  *         description: User updated successfully.
+ *         content:
+ *          application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponse'
  *       "400":
  *         description: Invalid ID or request body.
  *         content:
@@ -141,6 +145,10 @@ userRouter.patch(
  *     responses:
  *       "200":
  *         description: User retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponse'
  *       "400":
  *         description: Invalid user ID.
  *         content:
@@ -215,26 +223,14 @@ userRouter.get(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - name
- *               - email
- *               - age
- *             properties:
- *               name:
- *                 type: string
- *                 example: Sairose Shrestha
- *               email:
- *                 type: string
- *                 format: email
- *                 example: sairose@example.com
- *               age:
- *                 type: integer
- *                 minimum: 18
- *                 example: 23
+ *             $ref: '#/components/schemas/CreateUserRequest'
  *     responses:
  *       "201":
  *         description: User created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponse'
  *       "400":
  *         description: Invalid request body or validation error.
  *         content:
