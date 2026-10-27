@@ -17,7 +17,6 @@ import { validateRequest } from "../middleware/validate-request.js";
 
 const userRouter = Router();
 
-
 /**
  * @openapi
  * /api/users/{id}:
@@ -40,16 +39,22 @@ const userRouter = Router();
  *         description: User deleted successfully. No response body.
  *       "400":
  *         description: Invalid MongoDB ObjectId.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       "404":
  *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 userRouter.delete(
   "/:id",
   validateParams(userIdSchema),
   deleteUser,
 );
-
-
 
 /**
  * @openapi
@@ -93,10 +98,22 @@ userRouter.delete(
  *         description: User updated successfully.
  *       "400":
  *         description: Invalid ID or request body.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       "404":
  *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       "409":
  *         description: Email address already exists.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 userRouter.patch(
   "/:id",
@@ -105,14 +122,11 @@ userRouter.patch(
   updateUser,
 );
 
-
-
 /**
  * @openapi
  * /api/users/{id}:
  *   get:
- *     summary: Retrieve a user by ID
- *     description: Retrieves a single user using their MongoDB ObjectId.
+ *     summary: Get a user by ID
  *     tags:
  *       - Users
  *     parameters:
@@ -121,26 +135,30 @@ userRouter.patch(
  *         required: true
  *         schema:
  *           type: string
- *           pattern: "^[0-9a-fA-F]{24}$"
- *         description: A valid 24-character MongoDB ObjectId.
+ *           pattern: '^[0-9a-fA-F]{24}$'
+ *         description: MongoDB ObjectId of the user
  *         example: "507f1f77bcf86cd799439011"
  *     responses:
  *       "200":
  *         description: User retrieved successfully.
  *       "400":
- *         description: Invalid MongoDB ObjectId.
+ *         description: Invalid user ID.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       "404":
  *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 userRouter.get(
   "/:id",
   validateParams(userIdSchema),
   getUserById,
 );
-
-
-
-
 
 /**
  * @openapi
@@ -173,11 +191,16 @@ userRouter.get(
  *         description: Users retrieved successfully.
  *       "400":
  *         description: Invalid pagination parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-userRouter.get("/", validateQuery(paginationSchema), getUsers);
-
-
-
+userRouter.get(
+  "/",
+  validateQuery(paginationSchema),
+  getUsers,
+);
 
 /**
  * @openapi
@@ -214,12 +237,20 @@ userRouter.get("/", validateQuery(paginationSchema), getUsers);
  *         description: User created successfully.
  *       "400":
  *         description: Invalid request body or validation error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       "409":
  *         description: A user with this email address already exists.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-userRouter.post("/", createUser);
-
-
-
+userRouter.post(
+  "/",
+  createUser,
+);
 
 export default userRouter;
